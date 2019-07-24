@@ -16,4 +16,6 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.on('/').render('welcome')
+Route.group(()=>{
+    Route.resource('profesor', 'ProfesorController')
+}).prefix('api');
