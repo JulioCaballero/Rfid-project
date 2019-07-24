@@ -8,7 +8,7 @@ class ProfesorSchema extends Schema {
     this.create('profesors', (table) => {
       table.increments()
       table.string('nombre', 80).notNullable()
-      table.integer('asignatura_id').unsigned().references('id').inTable('asignatura')
+      table.integer('asignatura_id').unsigned().references('id').inTable('asignaturas')
       table.string('apellido_paterno', 80).notNullable()
       table.string('apellido_materno', 80).notNullable()
       table.string('telefono', 15).notNullable().unique()
