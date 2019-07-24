@@ -17,5 +17,7 @@
 const Route = use('Route')
 
 Route.group(()=>{
-    Route.resource('profesor', 'ProfesorController')
+    Route.resource('profesor', 'ProfesorController');
+    Route.resource('horario', 'HorarioController')
 }).prefix('api');
+
