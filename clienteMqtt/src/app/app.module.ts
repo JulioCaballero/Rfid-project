@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms'
+import { RouterModule, Routes } from '@angular/router';
 
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
@@ -17,6 +18,14 @@ import { from } from 'rxjs';
 import { ListaUsuariosComponent } from './components/lista-usuarios/lista-usuarios.component';
 import { LoginComponent } from './pages/login/login.component';
 import { MensajesComponent } from './pages/mensajes/mensajes.component';
+import { AlumnoComponent } from './alumno/alumno.component';
+
+import { MaterialModule }  from './material';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+
+import { AppRoutingModule } from './app-routing.module';
+import { RegistroAlumnoComponent } from './registro-alumno/registro-alumno.component';
+
 
 @NgModule({
   declarations: [
@@ -25,12 +34,25 @@ import { MensajesComponent } from './pages/mensajes/mensajes.component';
     ChatComponent,
     ListaUsuariosComponent,
     LoginComponent,
-    MensajesComponent
+    MensajesComponent,
+    AlumnoComponent,
+    RegistroAlumnoComponent,
+    
   ],
   imports: [
     BrowserModule,
+    MaterialModule,
+    BrowserAnimationsModule,
     FormsModule,
-    SocketIoModule.forRoot(config)
+    SocketIoModule.forRoot(config),
+    AppRoutingModule
+    
+  ],
+  exports:[
+    RegistroAlumnoComponent
+  ],
+  entryComponents: [
+    RegistroAlumnoComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

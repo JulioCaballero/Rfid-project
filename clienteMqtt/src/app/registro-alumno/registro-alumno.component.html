@@ -1,0 +1,45 @@
+<div class='example-form'>
+    <h1>Registro Alumno</h1>
+    <div>
+        <mat-form-field>
+                <input matInput [(ngModel)]="nombre" placeholder="Ingrese Nombre" class="example-full-width">
+        </mat-form-field>
+
+        <mat-form-field>
+                <input matInput [(ngModel)]="apellido_p"  placeholder="Ingrese Apellido Paterno" class="example-full-width">
+        </mat-form-field>
+
+        <mat-form-field>
+                <input matInput [(ngModel)]="apellido_m"  placeholder="Ingrese Apellido Materno" class="example-full-width">
+        </mat-form-field>
+    </div>    
+  
+    <mat-form-field>
+            <input matInput [(ngModel)]="rfid"  placeholder="Agrege RFID" class="example-full-width" disabled>
+    </mat-form-field>
+ 
+    <mat-form-field>
+            <input matInput [(ngModel)]="email"  placeholder="Ingrese Email" class="example-full-width">
+    </mat-form-field>   
+  
+    <mat-form-field>
+            <input matInput [(ngModel)]="matricula"  placeholder="Ingrese Matricula" class="example-full-width">
+    </mat-form-field>
+   
+    <mat-form-field>
+            <input matInput [(ngModel)]="telefono"  placeholder="Ingrese Telefono" class="example-full-width">
+    </mat-form-field>    
+    
+        <mat-form-field>
+                <mat-label>Elige tu Asignatura</mat-label>
+                <mat-select [(ngModel)]="asignaturas" multiple>
+                        <mat-option *ngFor="let asignatura of asignaturas_db" [value]="asignatura">
+                        {{asignatura}}
+                        </mat-option>
+                </mat-select>
+        </mat-form-field>
+<br>
+    <button mat-button color="primary" (click)="completo()">Agregar</button>
+    <p>Asignaturas: {{asignaturas}}</p>
+</div>
+
