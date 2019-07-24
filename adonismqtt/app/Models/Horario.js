@@ -4,6 +4,9 @@
 const Model = use('Model')
 
 class Horario extends Model {
+    asignaturas() {
+        return this.hasMany('App/Models/Asignatura')
+    }
 }
 
 module.exports = Horario
