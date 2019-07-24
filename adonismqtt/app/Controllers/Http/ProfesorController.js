@@ -1,15 +1,4 @@
 'use strict'
-const Profesor = use('App/Models/Profesor')
-const { validate } = use('Validator')
-const rules = {
-  nombre: 'required',
-  apellido_paterno: 'required',
-  apellido_materno: 'required',
-  telefono: 'required',
-  correo: 'required',
-  asignatura_id: 'required',
-  matricula: 'required'
-}
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -72,13 +61,18 @@ class ProfesorController {
    * @param {Response} ctx.response
    */
   async store({ request, response }) {
-    const validation = await validate(request.all(), rules)
-    if (validation.fails()) {
-      return validation.messages()
+    try {
+      const validation = await validate(request.all(), rules)
+      if (validation.fails()) {
+        return validation.messages()
+      }
+
+      let profesor = await Profesor.create(request.all())
+      return response.created(profesor)
+    } catch (error) {
+      return response.status(404).json({ message: 'Se produjo un error', error })
     }
 
-    let profesor = await Profesor.create(request.all())
-    return response.created(profesor)
   }
 
   /**
@@ -94,8 +88,8 @@ class ProfesorController {
     try {
       let { id } = params
       let profesor = await Profesor.findOrFail(id)
-      return response.status(200).json(profesor)
-    } catch {
+      return response.ok(profesor)
+    } catch (error) {
       return response.status(404).json({ message: 'Se produjo un error', error })
     }
   }
@@ -148,12 +142,12 @@ class ProfesorController {
   async destroy({ params, request, response }) {
     try {
       let { id } = params
-      let profesor = await Profesor.findOrFail(id)
+      let profesor = await Profesor.find(id)
       if (!profesor) {
         return response.status(404).json({ message: 'No existe el profesor' })
       }
       await profesor.delete()
-      return response.status(200).json({message: 'El profesor se ha eliminado con exito'})
+      return response.status(200).json({ message: 'El profesor se ha eliminado con exito' })
 
     } catch (error) {
       return response.status(404).json({ message: 'Se produjo un error', error })
