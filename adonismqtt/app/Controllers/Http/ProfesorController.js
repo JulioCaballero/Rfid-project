@@ -34,8 +34,8 @@ class ProfesorController {
   async index({ request, response, view }) {
     try {
       let profesores = await Profesor.all()
-      let profesorRelaciones = profesores.asignatura()
-      return response.status(200).json(profesorRelaciones)
+      //let profesorRelaciones = profesores.asignatura()
+      return response.status(200).json(profesores)
     } catch (error) {
       return response.status(404).json({ message: 'Se produjo un error', error })
     }
