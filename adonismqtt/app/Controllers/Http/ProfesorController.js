@@ -1,5 +1,15 @@
 'use strict'
-
+const Profesor = use('App/Models/Profesor')
+const { validate } = use('Validator')
+const rules = {
+  nombre: 'required',
+  apellido_paterno: 'required',
+  apellido_materno: 'required',
+  telefono: 'required',
+  correo: 'required',
+  asignatura_id: 'required',
+  matricula: 'required'
+}
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -7,9 +17,6 @@
 /**
  * Resourceful controller for interacting with profesors
  */
-
-const Profesor = use('App/Models/Profesor')
-const { validate } = use('Validator')
 
 
 
