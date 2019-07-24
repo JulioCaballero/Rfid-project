@@ -5,7 +5,7 @@ const Schema = use('Schema')
 
 class HorarioSchema extends Schema {
   up () {
-    this.create('horario', (table) => {
+    this.create('horarios', (table) => {
       table.increments()
       table.integer('hora_inicio', 10).notNullable()
       table.integer('hora_fin', 10).notNullable()
@@ -15,7 +15,7 @@ class HorarioSchema extends Schema {
   }
   
   down () {
-    this.drop('horario')
+    this.drop('horarios')
   }
 }
 
