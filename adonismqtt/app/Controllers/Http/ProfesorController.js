@@ -18,6 +18,17 @@ const rules = {
  * Resourceful controller for interacting with profesors
  */
 
+const Profesor = use('App/Models/Profesor')
+const { validate } = use('Validator')
+const rules = {
+  nombre: 'required',
+  asignatura_id: 'required',
+  apellido_paterno: 'required',
+  apellido_materno: 'required',
+  telefono: 'required',
+  correo: 'required',
+  matricula: 'required'
+};
 
 
 class ProfesorController {
@@ -32,8 +43,9 @@ class ProfesorController {
    */
   async index({ request, response, view }) {
     try {
-      let profesor = await Profesor.all()
-      return response.status(200).json(profesor)
+      let profesores = await Profesor.all()
+      //let profesorRelaciones = profesores.asignatura()
+      return response.status(200).json(profesores)
     } catch (error) {
       return response.status(404).json({ message: 'Se produjo un error', error })
     }
