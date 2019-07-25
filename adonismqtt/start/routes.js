@@ -25,5 +25,6 @@ Route.group(() => {
     // Route.delete('profesor/:id','ProfesorController.destroy')
     Route.resource('horario', 'HorarioController')
     Route.resource('alumno', 'AlumnoController')
+    Route.resource('asistencia', 'AsistenciaController')
 }).prefix('api');
 
