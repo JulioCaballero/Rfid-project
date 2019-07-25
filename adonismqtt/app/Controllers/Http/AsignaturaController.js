@@ -1,17 +1,18 @@
 'use strict'
-const Asignatura = use('App/Models/Horario');
+
 const rules = {
   nombre: 'required',
 };
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
-
+const Asignatura = use('App/Models/Horario');
+const { validate } = use('Validator');
 
 class AsignaturaController {
 
   async index ({ request, response, view }) {
-    let asignatura = await Asignatura.query();
+    let asignatura = await Asignatura.query().with('profesor').fetch();
     return response.status(200).json(asignatura);
   }
 

@@ -4,6 +4,13 @@
 const Model = use('Model')
 
 class Asignatura extends Model {
+    profesor() {
+        return this.hasOne('App/Models/Profesor')
+    }
+
+    alumnos() {
+        return this.belongsToMany('App/Models/Alumno')
+    }
 }
 
 module.exports = Asignatura
