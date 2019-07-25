@@ -5,7 +5,7 @@ const Model = use('Model')
 
 class Profesor extends Model {
     asignatura(){
-        return this.belongsTo('App/Models/Token')
+        return this.belongsTo('App/Models/Asignatura')
     }
 }
 

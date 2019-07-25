@@ -7,8 +7,8 @@ class AsistenciaSchema extends Schema {
   up () {
     this.create('asistencias', (table) => {
       table.increments()
-      table.integer('alumno_id').unsigned().references('id').inTable('alumno')
-      table.integer('horario_id').unsigned().references('id').inTable('horario')
+      table.integer('alumno_id').unsigned().references('id').inTable('alumnos')
+      table.integer('horario_id').unsigned().references('id').inTable('horarios')
       table.date('fecha', 60).notNullable()
       table.timestamps()
     })

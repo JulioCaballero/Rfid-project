@@ -11,6 +11,10 @@ class Asignatura extends Model {
     alumnos() {
         return this.belongsToMany('App/Models/Alumno')
     }
+
+    horario() {
+        return this.belongsTo('App/Models/Horario')
+    }
 }
 
 module.exports = Asignatura

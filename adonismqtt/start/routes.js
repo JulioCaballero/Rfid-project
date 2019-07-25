@@ -16,8 +16,14 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.group(()=>{
+Route.group(() => {
     Route.resource('profesor', 'ProfesorController');
+    Route.get('alumnos/:id', 'AlumnoController.getAlumnos')
+    // Route.get('profesor','ProfesorController.index')
+    // Route.put('profesor/:id','ProfesorController.update')
+    // Route.post('profesor','ProfesorController.store')
+    // Route.delete('profesor/:id','ProfesorController.destroy')
     Route.resource('horario', 'HorarioController')
+    Route.resource('alumno', 'AlumnoController')
 }).prefix('api');
 
