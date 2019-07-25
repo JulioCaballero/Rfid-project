@@ -16,9 +16,9 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.group(()=>{
-   Route.resource('profesor', 'ProfesorController');
-    // Route.get('profesor/:id','ProfesorController.show')
+Route.group(() => {
+    Route.resource('profesor', 'ProfesorController');
+    Route.get('alumnos/:id', 'AlumnoController.getAlumnos')
     // Route.get('profesor','ProfesorController.index')
     // Route.put('profesor/:id','ProfesorController.update')
     // Route.post('profesor','ProfesorController.store')

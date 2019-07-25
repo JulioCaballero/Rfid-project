@@ -5,6 +5,7 @@
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
 const Alumno = use('App/Models/Alumno');
+const Asignatura = use('App/Models/Asignatura')
 const { validate } = use('Validator');
 const rules = {
   nombre: 'required',
@@ -30,7 +31,7 @@ class AlumnoController {
    */
   async index ({ request, response, view }) {
     try{  
-      let alumno = await Alumno.query().with('asignaturas.profesor').with('asignaturas.horario').fetch()
+      let alumno = await Alumno.query().with('asignaturas').fetch()
     
       return response.status(200).json(alumno)
     }catch(error){
@@ -91,7 +92,9 @@ class AlumnoController {
   async show ({ params, request, response, view }) {
     try{
       let {id} = params
-      let alumno = await Alumno.query().with('asignaturas.profesor').with('asignaturas.horario').where('id', '=', id).fetch()
+      let alumno = await Alumno.query().with('asistencias.horario.asignaturas')
+      .with('asignaturas.horario').with('asignaturas.profesor').where('id', '=', id).fetch()
+
       if (alumno.rows == 0) {
         return response.status(404).json({data: 'Resource not found'})
       }
@@ -134,7 +137,7 @@ class AlumnoController {
   
       if (asignaturas && asignaturas.length > 0) {
         await alumno.asignaturas().sync(asignaturas)
-        await alumno.loadMany(['asignaturas.horario', 'asignaturas.profesor'])
+        await alumno.loadMany(['asignaturas.horarios', 'asignaturas.profesor'])
       }
       
       return response.status(200).json(alumno)
@@ -164,6 +167,21 @@ class AlumnoController {
       return response.status(404).json({ message: 'Se produjo un error', error })
     }
   }
+
+  async getAlumnos ({ params, request, response, view }) {
+    try{
+      let {id} = params
+      let alumno = await Asignatura.query().with('horario').with('alumnos.asistencias').where('id','=',id).fetch()
+      
+      if (alumno.rows == 0) {
+        return response.status(404).json({data: 'Resource not found'})
+      }
+      return response.ok(alumno)
+    }catch(error){
+      return response.status(404).json({ message: 'Se produjo un error', error })
+    }
+  }
+
 }
 
 module.exports = AlumnoController
