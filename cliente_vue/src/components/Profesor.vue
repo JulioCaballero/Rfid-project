@@ -254,7 +254,6 @@ import VeeValidate from 'vee-validate';
             value: 'id',
           },
           { text: 'Nombre', value: 'nombre' },
-          { text: 'RFID', value: 'RFID' },
           { text: 'Asignatura', value: 'asignatura' },
           { text: 'Fecha', value: 'protein' },
           { text: 'Email', value: 'fecha' },
