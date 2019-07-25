@@ -26,5 +26,6 @@ Route.group(() => {
     Route.resource('horario', 'HorarioController')
     Route.resource('alumno', 'AlumnoController')
     Route.resource('asignatura', 'AsignaturaController')
+    Route.resource('asistencia', 'AsistenciaController')
 }).prefix('api');
 
