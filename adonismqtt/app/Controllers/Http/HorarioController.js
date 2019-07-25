@@ -28,7 +28,7 @@ class HorarioController {
 
   async store ({ request, response }) {
     const validation = await validate(request.all(), rules)
-    if(validatios.fails()) {
+    if(validation.fails()) {
       return validation.message()
     }
     let horario = await Horario.create(request.all(), rules);
