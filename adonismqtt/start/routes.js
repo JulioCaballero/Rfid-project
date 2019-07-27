@@ -27,5 +27,6 @@ Route.group(() => {
     Route.resource('alumno', 'AlumnoController')
     Route.resource('asignatura', 'AsignaturaController')
     Route.resource('asistencia', 'AsistenciaController')
+    Route.get('asistencias/:id', 'AsistenciaController.asistencias')
 }).prefix('api');
 

@@ -2,7 +2,9 @@
     <v-app>
         <v-app-bar app dark> 
         <v-toolbar-title class="headline text-uppercase">        
+           <div v-on:click="select4()">
             <span class="font-weight-light">Asistencias</span>
+            </div>
         </v-toolbar-title>
         <v-spacer></v-spacer>      
                 PROFESOR           
@@ -302,7 +304,10 @@ import VeeValidate from 'vee-validate';
         },
         select3: function() {
             this.$router.push({name:'asignatura'})
-        }
+        },
+        select4: function() {
+            this.$router.push({name:'home'})
+        },
     }
   }
 </script>

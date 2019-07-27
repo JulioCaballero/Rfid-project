@@ -77,7 +77,7 @@ export default {
         },
         select3: function() {
             this.$router.push({name:'asignatura'})
-        }
+        },       
     }
 };
 </script>
