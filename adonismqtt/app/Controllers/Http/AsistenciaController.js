@@ -6,6 +6,7 @@
 
 const Asistencia = use('App/Models/Asistencia');
 const Alumno = use('App/Models/Alumno');
+const Asignatura = use('App/Models/Asignatura');
 const Horario = use('App/Models/Horario');
 const { validate } = use('Validator');
 const rules = {
@@ -37,7 +38,7 @@ class AsistenciaController {
    * @param {View} ctx.view
    */
   async create({ request, response, view }) {
-    
+
   }
 
   /**
@@ -49,70 +50,82 @@ class AsistenciaController {
    * @param {Response} ctx.response
    */
   async store({ request, response }) {
-    try{
-    const validation = await validate(request.all(), rules)
-    const {rfid} = request.all();
-    const now = new Date();
-    const dia = now.getDate();
-    const mes = now.getMonth() + 1;
-    const anio = now.getFullYear();
-    const hora = now.getHours();
-    const minutos = now.getMinutes();
-    const fecha_actual = anio + '-' + mes + '-' + dia;
-    console.log( anio + '  -  ' + mes + '  -  ' + dia +':'+hora+':'+minutos);
- 
-    if (validation.fails()) {
-      return validation.messages()
-    }
-    let alumno = await Alumno.query().where('rfid', '=', rfid).fetch()
-      console.log(alumno);
-      const auth = 0;
+    try {
+      const validation = await validate(request.all(), rules)
+      const { rfid } = request.all();
+      const now = new Date();
+      const dia = now.getDay();
+      // const dia = 1;
+      const mes = now.getMonth() + 1;
+      const anio = now.getFullYear();
+      const hora = now.getHours();
+      // const hora = 1;
+      const minutos = now.getMinutes();
+      const fecha_actual = anio + '-' + mes + '-' + dia + ' ' + hora + ':' + minutos;
+      console.log(fecha_actual)
+      if (validation.fails()) {
+        return validation.messages()
+      }
+      let alumno = await Alumno.query().with('asignaturas').where('rfid', '=', rfid).fetch()
+      // console.log(alumno);
+
       if (alumno.rows != 0) {
         let asistencia;
-       
-        let horario =  await Horario.query().where('dia', '=', dia).andWhere('hora_inicio','<=',hora)
-        .andWhere('hora_fin','>',hora).fetch()
-        
+        let auth = false;
+        let horario = await Horario.query().where('dia', '=', dia).andWhere('hora_inicio', '<=', hora)
+          .andWhere('hora_fin', '>', hora).fetch()
+
+        // console.log(horario.toJSON()[0].id) 
+
         if (horario.rows == 0) {
-          return response.status(404).json({data: 'No cuenta con ninguna asignatura en estos momentos'})
+          return response.status(404).json({ data: 'No cuenta con ninguna asignatura en estos momentos' })
         }
-        
-        let asignatura = Asignatura.query().where('horario_id','=',horario.id)
 
-        let asignaturas = alumno.query().asignaturas().fetch()
+        let asignatura = await Asignatura.query().where('horario_id', '=', horario.toJSON()[0].id).fetch()
 
-        asignaturas.forEach(function(asig) {
-          if(asig.id==asignatura.id){
-            auth = 1;
+        //console.log(asignatura.toJSON()) 
+
+        //  console.log(alumno.toJSON()[0].asignaturas) 
+
+        let asignaturas = alumno.toJSON()[0].asignaturas
+
+
+        asignaturas.forEach(element => {
+          //console.log(element.id)
+          //console.log(asignatura.toJSON()[0].id)
+          if (element.id == asignatura.toJSON()[0].id) {
+            auth = true;
           }
         });
 
-        if (auth == 0) {
+
+        if (auth == false) {
           return response.status(404).json({data: 'No cuenta con ninguna asignatura en estos momentos'})
         }
 
-        asistencia = await Asistencia.query().where('alumno_id','=',alumno.id).andWhere('horario_id').fetch() 
-        if (asistencia.rows != 0 && horario.rows != 0) {
+        asistencia = await Asistencia.query().where('alumno_id','=',alumno.toJSON()[0].id).andWhere('horario_id',horario.toJSON()[0].id).fetch() 
+        // console.log(asistencia)
+        if (asistencia.rows != 0) {
           return response.status(404).json({ data: 'Ya cuenta con asistencia' })
         }
-        
 
-        const {asistencia_result} = await Asistencia.create({
-          alumno_id: alumno.id,
-          horario_id: horario.id,  
-          fecha: now
+
+        const asistencia_result = await Asistencia.create({
+          alumno_id: alumno.toJSON()[0].id,
+          horario_id: horario.toJSON()[0].id,  
+          fecha: fecha_actual
         })
         //socket.emit('asistencia', 'ok')
-        return response.status(200).json({asistencia_result})
+        return response.status(200).json(asistencia_result)
       } else {
-       // socket.emit('rfid', rfids)
+        // socket.emit('rfid', rfids)
         return response.status(404).json({ data: 'El alumno o rfid no existe' })
       }
-    }catch(error){
+    } catch (error) {
       return response.status(404).json({ message: 'Se produjo un error', error })
     }
 
-    
+
   }
 
   /**
@@ -159,6 +172,15 @@ class AsistenciaController {
    * @param {Response} ctx.response
    */
   async destroy({ params, request, response }) {
+  }
+
+  async asistencias({ params, request, response }) {
+    const {id} = params
+
+    let alumno = await Alumno.query().with('asistencias.horario').with('asignaturas.horario').where('id','=',id).fetch()
+    let asistencias_horario = alumno.toJSON()[0].asistencias
+ //   let asignaturas_horario = alumno.toJSON()[0].asistencias.
+    return asistencias_horario.horario().fetch();
   }
 }
 
