@@ -46,18 +46,18 @@
                                     v-model="horario"
                                     required
                                     v-validate="'required'"
-                                    item-text="horai"
-                                    item-value="id"
+                                    return-object
+                                    single-line
                                     ></v-select>
                                 </v-flex>
                                 </v-layout>
                             </v-container>
-                            <small>*indicates required field</small>
+                            <small>*Campo obligatorio</small>
                             </v-card-text>
                             <v-card-actions>
                             <v-spacer></v-spacer>
                             <v-btn color="blue darken-1" text @click="dialog = false">Close</v-btn>
-                            <v-btn color="blue darken-1" text @click="dialog = false">Save</v-btn>
+                            <v-btn color="blue darken-1" text @click="submit" >Save</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-dialog>  
@@ -66,16 +66,30 @@
                     <v-flex xs12 sm3 d-flex>
                         <v-select
                         :items="asignaturas"
+                        v-model="search"
                         label="Asignatura"
                         ></v-select>
                     </v-flex>
-                    <v-btn> Seleccionar</v-btn>
+                    <v-btn @click="vaciar"> Mostrar todos </v-btn>
                     <v-spacer></v-spacer>
 
-                    <!-- Dialogo Alumno Actualizar-->
+                                       
+                </v-card-actions>
+                <br>
+                <v-data-table
+                    :headers="headers"
+                    :items="tabladatos"
+                    :search="search"
+                    :items-per-page="5"
+                    class="elevation-1"
+                    
+                >
+                <template v-slot:item.action="{ item }">
+                    <v-card-actions>
+                <!-- Dialogo Alumno Actualizar-->
                     <v-dialog v-model="dialog2" persistent max-width="600px" >
                         <template v-slot:activator="{ on }">                            
-                            <v-btn text class="indigo darken-4 text-center" dark v-on="on">Actualizar</v-btn>
+                            <v-btn text class="indigo darken-4 text-center" dark v-on="on" @click="modificar(item.id)">Actualizar</v-btn>
                         </template>
                         <v-card>
                             <v-card-title>
@@ -100,8 +114,8 @@
                                     v-model="horario_db"
                                     required
                                     v-validate="'required'"
-                                    item-text="horai"
-                                    item-value="id"
+                                    return-object
+                                    single-line
                                     ></v-select>
                                 </v-flex>                                
                                 </v-layout>
@@ -111,23 +125,16 @@
                             <v-card-actions>
                             <v-spacer></v-spacer>
                             <v-btn color="blue darken-1" text @click="dialog2 = false">Close</v-btn>
-                            <v-btn color="blue darken-1" text @click="dialog2 = false">Save</v-btn>
+                            <v-btn color="blue darken-1" text @click="actualizar">Save</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-dialog>  
                     <!-- Dialogo Alumno Actualizar -->
 
-                    
-                    
-                    <v-btn text class="red accent-4 text-center" dark >Eliminar</v-btn>                    
+                    <v-btn text class="red accent-4 text-center" dark @click="eliminar(item.id)">Eliminar</v-btn> 
                 </v-card-actions>
-                <br>
-                <v-data-table
-                    :headers="headers"
-                    :items="desserts"
-                    :items-per-page="5"
-                    class="elevation-1"
-                ></v-data-table>
+                </template>
+                </v-data-table>
             </v-card>
         </div>
     </v-app>
@@ -135,28 +142,33 @@
 <script>
 import Vue from 'vue'
 import VeeValidate from 'vee-validate';
+import { API } from '../Servicios/axios';
 
  Vue.use(VeeValidate);
 
   export default {
-    data () {
-      return {
-        nombre:"",        
-        horario:[],
-
+    data: () => ({
+       
+        nombre:"",
+        hora_i:"",
+        hora_f:"",
+        hora_a:"",
+        hora_b:"",
+        id:"",
+        param:"",
+        f:"",
+        horario_id:"",
         nombre_db:"",        
         horario_db:[],
-
+        search:"",
 
         dialog: false,
         dialog2: false,
-
-        asignaturas: ['Foo', 'Bar', 'Fizz', 'Buzz'],     
-        
+        tabladatos:[],
+        asignaturas: [],  
+        horario:[],   
         horarios:[
-            {horai: '8', horaf: '9', id: '1' },
-            {horai: '9', horaf: '10', id: '2' },
-            {horai: '10', horaf: '11', id: '3' },
+            
         ],
 
         headers: [
@@ -168,43 +180,12 @@ import VeeValidate from 'vee-validate';
           },
           { text: 'Nombre', value: 'nombre' },
           { text: 'Hora Inicio', value: 'hora_i' },
-          { text: 'Hora Final', value: 'hora_f' },         
+          { text: 'Hora Final', value: 'hora_f' },
+           { text: 'Acciones', value: 'action', sortable: false }         
         ],
-        desserts: [
-          {
-            id: '1',
-            nombre: 'Braulio',
-            hora_i: 6.0,
-            hora_f: 24,
-            
-            
-          },
-          {
-            id: '2',
-            nombre: 237,
-            hora_i: 9.0,
-            hora_f: 37,
-            
-           
-          },
-          {
-            id: '3',
-            nombre: 262,
-            hora_i: 16.0,
-            hora_f: 23,
-           
-           
-          },
-          {
-            id: '4',
-            nombre: 305,
-            hora_i: 3.7,
-            hora_f: 67,
-            
-            
-          },
-        ],
-      }
+      }),
+    mounted(){
+        this.init()
     },
     methods: {
         select2: function() {
@@ -213,6 +194,72 @@ import VeeValidate from 'vee-validate';
         select: function() {
             this.$router.push({name:'alumno'})
         },
+        dias(dia){
+            switch (dia) {
+                case 1:
+                    return "Lunes"
+                    break;
+                case 2:
+                    return "Martes"
+                    break;
+                case 3:
+                    return "Miercoles"
+                    break;
+                case 4:
+                    return "Jueves"
+                    break;
+                case 5:
+                    return "Viernes"
+                    break;
+            }
+        },
+        init(){
+            this.horarios=[],
+            this.tabladatos=[],
+            API.get('asignatura').then(response =>{
+            for(var i=0; i< response.data.length;i++){
+                this.asignaturas.push(response.data[i].nombre)
+                this.f = response.data[i]
+                this.tabladatos.push({id: this.f.id, nombre: this.f.nombre, hora_i: this.f.horario.hora_inicio, hora_f: this.f.horario.hora_fin})
+            }
+        }),
+            API.get('horario').then(response =>{
+                for(var i=0; i< response.data.length;i++){
+                    this.horarios.push({text: this.dias(response.data[i].dia) + " de "+response.data[i].hora_inicio +":00  -  " + response.data[i].hora_fin +":00", id: response.data[i].id})
+                }
+                // console.log(this.horarios)
+            })
+        },
+        submit(){
+            API.post('asignatura',{
+                nombre: this.nombre,
+                horario_id: this.horario.id,
+            })
+            this.nombre=""
+            this.horario=""
+            this.dialog = false
+            this.init()
+        },
+        vaciar(){
+            this.search = ""
+        },
+        modificar(id){
+            this.param = id
+            API.get('asignatura/' + id).then(response=> {
+                console.log(response.data)
+                this.nombre_db = response.data[0].nombre
+            })
+        },
+        actualizar(){
+            API.put('asignatura/' + this.param, {
+                nombre: this.nombre_db,
+                horario_id: this.horario_db.id
+            })
+            this.dialog2 = false
+        },
+        eliminar(id){
+            API.delete('asignatura/'+ id)
+        }
     }
   }
 </script>
