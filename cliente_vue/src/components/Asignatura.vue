@@ -2,7 +2,9 @@
     <v-app>
         <v-app-bar app dark> 
         <v-toolbar-title class="headline text-uppercase">        
+           <div v-on:click="select4()">
             <span class="font-weight-light">Asistencias</span>
+            </div>
         </v-toolbar-title>
         <v-spacer></v-spacer>      
                 ASIGNATURA           
@@ -42,13 +44,35 @@
                                 <v-flex xs12 sm6>
                                     <v-select
                                     :items="horarios"
-                                    label="Horario*"                                    
+                                    label="Hora Inicio*"                                    
                                     v-model="horario"
                                     required
                                     v-validate="'required'"
                                     item-text="horai"
                                     item-value="id"
                                     ></v-select>
+                                </v-flex>
+                                <v-flex xs12 sm6>
+                                    <v-select
+                                    :items="horarios"
+                                    label="Hora Final*"                                    
+                                    v-model="horariof"
+                                    required
+                                    v-validate="'required'"
+                                    item-text="horai"
+                                    item-value="id"
+                                ></v-select>
+                                </v-flex>
+                                <v-flex xs12 sm6>
+                                    <v-select
+                                    :items="dias"
+                                    label="Dia*"                                    
+                                    v-model="dia"
+                                    required
+                                    v-validate="'required'"
+                                    item-text="horai"
+                                    item-value="id"
+                                ></v-select>
                                 </v-flex>
                                 </v-layout>
                             </v-container>
@@ -96,14 +120,36 @@
                                 <v-flex xs12 sm6>
                                     <v-select
                                     :items="horarios"
-                                    label="Horario*"                                    
+                                    label="Hora Inicio*"                                    
                                     v-model="horario_db"
                                     required
                                     v-validate="'required'"
                                     item-text="horai"
                                     item-value="id"
                                     ></v-select>
-                                </v-flex>                                
+                                </v-flex> 
+                                <v-flex xs12 sm6>
+                                    <v-select
+                                    :items="horarios"
+                                    label="Hora Final*"                                    
+                                    v-model="horariof"
+                                    required
+                                    v-validate="'required'"
+                                    item-text="horai"
+                                    item-value="id"
+                                ></v-select>
+                                </v-flex> 
+                                <v-flex xs12>
+                                    <v-select
+                                    :items="horarios"
+                                    label="Hora Final*"                                    
+                                    v-model="horariof"
+                                    required
+                                    v-validate="'required'"
+                                    item-text="horai"
+                                    item-value="id"
+                                ></v-select>
+                                </v-flex>                               
                                 </v-layout>
                             </v-container>
                             <small>*indicates required field</small>
@@ -143,10 +189,11 @@ import VeeValidate from 'vee-validate';
       return {
         nombre:"",        
         horario:[],
+        horariof:[],
 
         nombre_db:"",        
         horario_db:[],
-
+        horariof_db:[],
 
         dialog: false,
         dialog2: false,
@@ -158,7 +205,13 @@ import VeeValidate from 'vee-validate';
             {horai: '9', horaf: '10', id: '2' },
             {horai: '10', horaf: '11', id: '3' },
         ],
-
+        dias:[
+            {text: 'Lunes', id: '1' },
+            {text: 'Martes', id: '2' },
+            {text: 'Miercoles', id: '3' },
+            {text: 'Jueves', id: '4' },
+            {text: 'Viernes', id: '5' },
+        ],
         headers: [
           {
             text: 'ID',
@@ -212,6 +265,9 @@ import VeeValidate from 'vee-validate';
         },
         select: function() {
             this.$router.push({name:'alumno'})
+        },
+        select4: function() {
+            this.$router.push({name:'home'})
         },
     }
   }
