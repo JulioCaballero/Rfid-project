@@ -16,6 +16,15 @@ const rules = {
   apellido_paterno: 'required',
   apellido_materno: 'required',
 };
+
+const rules2 = {
+  nombre: 'required',
+  correo: 'required',
+  matricula: 'required',
+  telefono: 'required',
+  apellido_paterno: 'required',
+  apellido_materno: 'required',
+};
 /**
  * Resourceful controller for interacting with alumnos
  */
@@ -128,7 +137,7 @@ class AlumnoController {
     try{
       let alumno = await Alumno.findOrFail(params.id)
       let {asignaturas, ...data} = request.all(['asignaturas'])
-      const validation = await validate(request.all(), rules)
+      const validation = await validate(request.all(), rules2)
       if (validation.fails()) {
         return validation.messages()
       }
