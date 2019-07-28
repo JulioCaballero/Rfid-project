@@ -28,11 +28,17 @@ class HorarioController {
 
   async store ({ request, response }) {
     const validation = await validate(request.all(), rules)
-    if(validation.fails()) {
-      return validation.message()
+    const {hora_inicio,hora_fin,dia} = request.all() 
+    let horario = Horario.query().where('hora_inico',hora_inicio).andWhere('hora_fin',hora_fin).andWhere('dia',dia).fetch()
+    if(horario.rows !=0){
+      if(validation.fails()) {
+        return validation.message()
+      }
+      let horario = await Horario.create(request.all(), rules);
+      return response.created(horario);
     }
-    let horario = await Horario.create(request.all(), rules);
-    return response.created(horario);
+   
+    return horario;
   }
 
   async show ({ params, request, response, view }) {
