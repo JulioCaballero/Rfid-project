@@ -21,7 +21,7 @@
                     <!-- Dialogo Alumno -->
                     <v-dialog v-model="dialog" persistent max-width="600px" >
                         <template v-slot:activator="{ on }">
-                            <v-btn text class="green darken-4 text-center" dark v-on="on">Registrar</v-btn>
+                            <v-btn text class="green darken-4 text-center" dark @click="abrir()">Registrar</v-btn>
                         </template>
                         <v-card>
                             <v-card-title>
@@ -44,6 +44,18 @@
                                     :items="horarios"
                                     label="Horario*"                                    
                                     v-model="horario"
+                                    required
+                                    v-on:change="selectDay()"
+                                    v-validate="'required'"
+                                    return-object
+                                    single-line
+                                    ></v-select>
+                                </v-flex>
+                                <v-flex xs12 sm6>
+                                    <v-select
+                                    :items="horas"
+                                    label="Horas"                                    
+                                    v-model="hora"
                                     required
                                     v-validate="'required'"
                                     return-object
@@ -89,7 +101,7 @@
                 <!-- Dialogo Alumno Actualizar-->
                     <v-dialog v-model="dialog2" persistent max-width="600px" >
                         <template v-slot:activator="{ on }">                            
-                            <v-btn text class="indigo darken-4 text-center" dark v-on="on" @click="modificar(item.id)">Actualizar</v-btn>
+                            <v-btn text class="indigo darken-4 text-center" dark @click="modificar(item.id)">Actualizar</v-btn>
                         </template>
                         <v-card>
                             <v-card-title>
@@ -158,7 +170,9 @@ import { API } from '../Servicios/axios';
         param:"",
         f:"",
         horario_id:"",
-        nombre_db:"",        
+        nombre_db:"",
+        horas:[],
+        hora:"",        
         horario_db:[],
         search:"",
 
@@ -213,37 +227,55 @@ import { API } from '../Servicios/axios';
                     break;
             }
         },
+        selectDay(){
+            console.log(this.horario.array)
+            this.horas=this.horario.array
+        },
         init(){
-            this.horarios=[],
-            this.tabladatos=[],
+            this.horarios=[]
+            this.tabladatos=[]
             API.get('asignatura').then(response =>{
-            for(var i=0; i< response.data.length;i++){
-                this.asignaturas.push(response.data[i].nombre)
-                this.f = response.data[i]
-                this.tabladatos.push({id: this.f.id, nombre: this.f.nombre, hora_i: this.f.horario.hora_inicio, hora_f: this.f.horario.hora_fin})
-            }
-        }),
+                console.log(response.data)
+                for(var i=0; i< response.data.length;i++){
+                    this.asignaturas.push(response.data[i].nombre)
+                    this.f = response.data[i]
+                    this.tabladatos.push({id: this.f.id, nombre: this.f.nombre, hora_i: this.f.horario.hora_inicio, hora_f: this.f.horario.hora_fin})
+                }
+            })
             API.get('horario').then(response =>{
                 for(var i=0; i< response.data.length;i++){
-                    this.horarios.push({text: this.dias(response.data[i].dia) + " de "+response.data[i].hora_inicio +":00  -  " + response.data[i].hora_fin +":00", id: response.data[i].id})
+                    // this.horarios.push({text: this.dias(response.data[i].dia) + " de "+response.data[i].hora_inicio +":00  -  " + response.data[i].hora_fin +":00", id: response.data[i].id})
+                    this.horarios.push({text: this.dias(response.data[i].dia), array:[]})
+                    // this.horarios[i].array.push({text:response.data[i].hora_inicio +":00  -  " + response.data[i].hora_fin +":00",id: response.data[i].id})        
+                    for(var x = 0;x<response.data.length;x++){
+                        if(response.data[i].dia == response.data[x].dia){
+                            this.horarios[i].array.push({text:response.data[x].hora_inicio +":00  -  " + response.data[x].hora_fin +":00",id: response.data[x].id})
+                        }
+                    }
                 }
                 // console.log(this.horarios)
             })
         },
+        abrir(){
+            this.dialog=true
+        },
         submit(){
             API.post('asignatura',{
                 nombre: this.nombre,
-                horario_id: this.horario.id,
+                horario_id: this.hora.id,
+            }).then((response)=>{
+                this.nombre=""
+                this.horario=""
+                this.dialog = false
+                this.init()
             })
-            this.nombre=""
-            this.horario=""
-            this.dialog = false
-            this.init()
+            
         },
         vaciar(){
             this.search = ""
         },
         modificar(id){
+            this.dialog2=true
             this.param = id
             API.get('asignatura/' + id).then(response=> {
                 console.log(response.data)
@@ -254,11 +286,15 @@ import { API } from '../Servicios/axios';
             API.put('asignatura/' + this.param, {
                 nombre: this.nombre_db,
                 horario_id: this.horario_db.id
+            }).then(()=>{
+                this.init()
             })
             this.dialog2 = false
         },
         eliminar(id){
-            API.delete('asignatura/'+ id)
+            API.delete('asignatura/'+ id).then((response)=>{
+                this.init()
+            })
         }
     }
   }
