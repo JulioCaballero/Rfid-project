@@ -32,7 +32,8 @@ class ProfesorController {
    */
   async index({ request, response, view }) {
     try {
-      let profesores = await Profesor.query().with('asignaturas').fetch()
+      let profesores = await Profesor.query().fetch()
+      //let profesores = await Profesor.query().with('asignaturas').fetch()
       //let profesorRelaciones = profesores.asignatura()
       return response.status(200).json(profesores)
     } catch (error) {
