@@ -260,11 +260,23 @@
 <script>
 import Vue from 'vue'
 import VeeValidate from 'vee-validate';
+<<<<<<< HEAD
+import io from 'socket.io-client';
+const socket = io('http://localhost:3000')
+=======
 import { API } from '../Servicios/axios';
+>>>>>>> 0cb7e99b756daeabb62c9c905219d7996910efa2
 
  Vue.use(VeeValidate);
 
+socket.on('alumno_rfid',(rfid)=>{
+   this.rfid = rfid;
+});
+
   export default {
+    data: () => ({
+     rfid:"hola"
+    }),
     data () {
       return {
           $_veeValidate: {
@@ -277,7 +289,10 @@ import { API } from '../Servicios/axios';
         email:"",
         telefono:"",
         matricula:"",
+<<<<<<< HEAD
+=======
         rfid:"asdasd123",
+>>>>>>> 0cb7e99b756daeabb62c9c905219d7996910efa2
         asignatura:[],
 
         alumnos:[],
@@ -312,7 +327,44 @@ import { API } from '../Servicios/axios';
           { text: 'Horariio id', value: 'horario_id' },         
           { text: 'Fecha', value: 'fecha' }          
         ],
+<<<<<<< HEAD
+        desserts: [
+          {
+            id: '1',
+            nombre: 'Braulio',
+            RFID: this.rfid,
+            asignatura: 24,
+            fecha: 4.0,
+            
+          },
+          {
+            id: '2',
+            nombre: 237,
+            RFID: 9.0,
+            asignatura: 37,
+            fecha: 4.3,
+           
+          },
+          {
+            id: '3',
+            nombre: 262,
+            RFID: 16.0,
+            asignatura: 23,
+            fecha: 6.0,
+           
+          },
+          {
+            id: '4',
+            nombre: 305,
+            RFID: 3.7,
+            asignatura: 67,
+            fecha: 4.3,
+            
+          },
+        ],
+=======
         desserts: [],
+>>>>>>> 0cb7e99b756daeabb62c9c905219d7996910efa2
       }
     },
      created(){

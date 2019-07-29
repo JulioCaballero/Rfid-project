@@ -10,17 +10,20 @@
     <script src="https://unpkg.com/@adonisjs/websocket-client"></script>
     <script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
     <script>
-        const ws = adonis.Ws('ws://localhost:3333')
+        const io = require('socket.io-client');
+        const socket = io('http://192.169.137.1:3000')
+        socket.emit('mensaje','hola mUndo')
+        // const ws = adonis.Ws('ws://localhost:3333')
 
-        ws.connect();
+        // ws.connect();
 
-        const chat = ws.subscribe('msj')
+        // const chat = ws.subscribe('msj')
 
-        // chat.on('chat', () => {
-        //     chat.emit('message', 'Hello server')
-        // })
+        // // chat.on('chat', () => {
+        // //     chat.emit('message', 'Hello server')
+        // // })
 
-        chat.emit('mensaje',{messaje: "holaMundo"})
+        // chat.emit('mensaje',{messaje: "holaMundo"})
 
         
     </script>
