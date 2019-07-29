@@ -233,27 +233,57 @@
                     <v-btn text class="red accent-4 text-center" dark @click="eliminar">Eliminar</v-btn>                    
                 </v-card-actions>
                 <br>
+                <v-container><h3>Datos del Alumno</h3></v-container>
+                
+                <v-simple-table>
+                    <thead>
+                    <tr>
+                        <th class="text-left">Nombre</th>
+                        <th class="text-left">RFID</th>
+                        <th class="text-left">Correo</th>
+                        <th class="text-left">Matricula</th>
+                        <th class="text-left">Telefono</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="item in data_alumno" :key="item.id">
+                        <td>{{ item.nombre }}</td>
+                        <td>{{ item.rfid }}</td>
+                        <td>{{ item.correo }}</td>
+                        <td>{{ item.matricula }}</td>
+                        <td>{{ item.telefono }}</td>
+                    </tr>
+                    </tbody>
+                </v-simple-table>
+                <br>
+                <v-container><h3>Asistencias</h3></v-container>
                 <v-data-table
                     :headers="headers"
                     :items="desserts"
                     :items-per-page="5"
                     class="elevation-1"
                 ></v-data-table>
-
+                <br>
+                <v-container><h3>Materias Asistidas</h3></v-container>
                 <v-simple-table>
                     <thead>
                     <tr>
                         <th class="text-left">Nombre</th>
-                        <th class="text-left">Asignatura</th>
+                        <th class="text-left">Hora Inicio</th>
+                        <th class="text-left">Hora Final</th>
+                        <th class="text-left">Dia</th>                    
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="item in desserts" :key="item.id">
+                    <tr v-for="item in materias_alumno" :key="item.id">
                         <td>{{ item.nombre }}</td>
-                        <td>{{ item.horario_id }}</td>
+                        <td>{{ item.horario.hora_inicio }}</td>
+                        <td>{{ item.horario.hora_fin }}</td>
+                        <td>{{ item.horario.dia }}</td>                        
                     </tr>
                     </tbody>
                 </v-simple-table>
+                
                 
             </v-card>
         </div>
@@ -320,6 +350,8 @@ import io from 'socket.io-client';
           { text: 'Fecha', value: 'fecha' }          
         ],
         desserts: [],
+        materias_alumno:[],
+        data_alumno:[]
       }
     },
     mounted() {
@@ -447,8 +479,10 @@ import io from 'socket.io-client';
         getAsistencias(){
             API.get('alumno/' + this.alumno_select)
             .then((response)=>{   
-                console.log(response.data[0].asistencias)             
-                this.desserts = response.data[0].asistencias                 
+                console.log(response.data[0].asistencias) 
+                this.data_alumno = response.data,            
+                this.desserts = response.data[0].asistencias,
+                this.materias_alumno = response.data[0].asignaturas             
             })   
         },
 

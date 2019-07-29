@@ -215,6 +215,28 @@
                 required
                 ></v-text-field>
                 <br>
+                <v-container><h3>Datos del Profesor</h3></v-container>
+                
+                <v-simple-table>
+                    <thead>
+                    <tr>
+                        <th class="text-left">Nombre</th>                        
+                        <th class="text-left">Correo</th>
+                        <th class="text-left">Matricula</th>
+                        <th class="text-left">Telefono</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="item in data_profesor" :key="item.id">
+                        <td>{{ item.nombre }}</td>                        
+                        <td>{{ item.correo }}</td>
+                        <td>{{ item.matricula }}</td>
+                        <td>{{ item.telefono }}</td>
+                    </tr>
+                    </tbody>
+                </v-simple-table>
+                <br>
+                <v-container><h3>Alumnos de la Materia</h3></v-container>
                 <v-data-table
                     :headers="headers"
                     :items="desserts"
@@ -264,19 +286,17 @@ import { API } from '../Servicios/axios';
         profesores: [],
         materia:"",
         materias:[],
-
+        data_profesor:[],
         headers: [
           {
             text: 'ID',
             align: 'left',
             sortable: false,
             value: 'id',
-          },
-          { text: 'Asignatura', value: 'nombre' },
-          { text: 'Nombre', value: 'alumnos[0].nombre' },
-          { text: 'Fecha', value: 'alumnos[0].asistencias' },
-          { text: 'Email', value: 'alumnos[0].correo' },
-          { text: 'Telefono', value: 'alumnos[0].telefono' },
+          },          
+          { text: 'Nombre', value: 'nombre' },          
+          { text: 'Email', value: 'correo' },
+          { text: 'Telefono', value: 'telefono' },
           
         ],
         desserts: [],
@@ -370,7 +390,7 @@ import { API } from '../Servicios/axios';
             API.get('alumnos/'+ asignatura)
             .then((response)=>{        
                 console.log(response.data)        
-                this.desserts = response.data    
+                this.desserts = response.data[0].alumnos 
                 this.materia  = response.data[0].nombre       
             })            
         },
@@ -393,7 +413,8 @@ import { API } from '../Servicios/axios';
             
             API.get('profesor/' + this.profesor_select)
             .then((response)=>{     
-                                    
+                
+                this.data_profesor.push(response.data),                              
                 this.nombre_db = response.data.nombre ,
                 this.apellido_p_db= response.data.apellido_paterno ,
                 this.apellido_m_db= response.data.apellido_materno ,

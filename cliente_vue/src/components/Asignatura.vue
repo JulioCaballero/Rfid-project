@@ -167,13 +167,13 @@ import { API } from '../Servicios/axios';
         hora_a:"",
         hora_b:"",
         id:"",
-        param:"",
+        param:0,
         f:"",
-        horario_id:"",
+        horario_id:0,
         nombre_db:"",
         horas:[],
         hora:"",        
-        horario_db:[],
+        horario_db:0,
         search:"",
 
         dialog: false,
@@ -184,6 +184,7 @@ import { API } from '../Servicios/axios';
         horarios:[
             
         ],
+        asignatura_select:0,
 
         headers: [
           {
@@ -245,7 +246,7 @@ import { API } from '../Servicios/axios';
             API.get('horario').then(response =>{
                 for(var i=0; i< response.data.length;i++){
                     // this.horarios.push({text: this.dias(response.data[i].dia) + " de "+response.data[i].hora_inicio +":00  -  " + response.data[i].hora_fin +":00", id: response.data[i].id})
-                    this.horarios.push({text: this.dias(response.data[i].dia), array:[]})
+                    this.horarios.push({id:response.data[i].dia,text: this.dias(response.data[i].dia), array:[]})
                     // this.horarios[i].array.push({text:response.data[i].hora_inicio +":00  -  " + response.data[i].hora_fin +":00",id: response.data[i].id})        
                     for(var x = 0;x<response.data.length;x++){
                         if(response.data[i].dia == response.data[x].dia){
@@ -277,24 +278,32 @@ import { API } from '../Servicios/axios';
         modificar(id){
             this.dialog2=true
             this.param = id
+            console.log(this.horarios[0])
             API.get('asignatura/' + id).then(response=> {
                 console.log(response.data)
                 this.nombre_db = response.data[0].nombre
             })
         },
         actualizar(){
-            API.put('asignatura/' + this.param, {
+            API.put(('asignatura/' + this.param),{
                 nombre: this.nombre_db,
                 horario_id: this.horario_db.id
-            }).then(()=>{
-                this.init()
+            }).then(function (response){
+                
+                console.log(response);
             })
+            this.init()
             this.dialog2 = false
         },
-        eliminar(id){
-            API.delete('asignatura/'+ id).then((response)=>{
-                this.init()
+        eliminar(id){            
+            API({
+              method:'delete',
+              url:('asignatura/'+ id),
+            }).then(function (response) {
+                console.log(response);
+               
             })
+             this.init()
         }
     }
   }
