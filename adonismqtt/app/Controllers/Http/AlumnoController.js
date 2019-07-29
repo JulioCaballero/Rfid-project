@@ -5,6 +5,8 @@
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
 const Alumno = use('App/Models/Alumno');
+const io = require('socket.io-client');
+const socket = io('http://localhost:3000')
 const Asignatura = use('App/Models/Asignatura')
 const { validate } = use('Validator');
 const rules = {
@@ -108,6 +110,21 @@ class AlumnoController {
         return response.status(404).json({data: 'Resource not found'})
       }
       return response.ok(alumno)
+    }catch(error){
+      return response.status(404).json({ message: 'Se produjo un error', error })
+    }
+  }
+
+  async alumno_rfid({ params, request, response, view }) {
+    try{
+      let {rfid} = request.all();
+      let alumno = await Alumno.findBy('rfid', rfid)
+
+      if (alumno.rows == 0) {
+        return response.status(404).json({data: 'El alumno no esta registrado, por favor ingresar a la pagina de registro'})
+      }
+      socket.emit('alumno_rfid',rfid)
+      return response.status(200).json(alumno)
     }catch(error){
       return response.status(404).json({ message: 'Se produjo un error', error })
     }
