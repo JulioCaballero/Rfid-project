@@ -113,9 +113,10 @@
                         item-value="id"
                         label="Profesores"
                         v-model="profesor_select"
+                        @change="getProfesor()"
                         ></v-select>
                     </v-flex>
-                    <v-btn @click="getProfesor"> Seleccionar</v-btn>
+                    
                     <v-spacer></v-spacer>
 
                     <!-- Dialogo Profesor Actualizar-->
@@ -202,17 +203,21 @@
                             </v-card-actions>
                         </v-card>
                     </v-dialog>  
-                    <!-- Dialogo Profesor Actualizar -->
-
-
-                    
+                    <!-- Dialogo Profesor Actualizar -->                   
                     
                     <v-btn text class="red accent-4 text-center" dark @click="eliminar">Eliminar</v-btn>                    
                 </v-card-actions>
+                <v-text-field 
+                label="Asignatura" 
+                v-model="materia"
+                
+                disabled
+                required
+                ></v-text-field>
                 <br>
                 <v-data-table
                     :headers="headers"
-                    :items="desserts[0]"
+                    :items="desserts"
                     :items-per-page="5"
                     class="elevation-1"
                 ></v-data-table>
@@ -257,7 +262,7 @@ import { API } from '../Servicios/axios';
         profesor_select:0,
 
         profesores: [],
-
+        materia:"",
         materias:[],
 
         headers: [
@@ -267,11 +272,11 @@ import { API } from '../Servicios/axios';
             sortable: false,
             value: 'id',
           },
-          { text: 'Nombre', value: 'nombre' },
-          { text: 'Asignatura', value: 'asignatura' },
-          { text: 'Fecha', value: 'protein' },
-          { text: 'Email', value: 'fecha' },
-          { text: 'Telefono', value: 'iron' },
+          { text: 'Asignatura', value: 'nombre' },
+          { text: 'Nombre', value: 'alumnos[0].nombre' },
+          { text: 'Fecha', value: 'alumnos[0].asistencias' },
+          { text: 'Email', value: 'alumnos[0].correo' },
+          { text: 'Telefono', value: 'alumnos[0].telefono' },
           
         ],
         desserts: [],
@@ -310,7 +315,8 @@ import { API } from '../Servicios/axios';
                     console.log(response);
                 });                
                 this.dialog = false;                
-                this.clean();                        
+                this.clean(); 
+                this.getProfesores();                       
             }            
         })
         },
@@ -327,7 +333,8 @@ import { API } from '../Servicios/axios';
                         asignatura_id:this.asignatura_db
                     })                                                          
                     this.dialog2 = false;               
-                    this.$validator.reset()                       
+                    this.$validator.reset()
+                    this.getProfesores()                       
                 }            
             })
         },
@@ -363,7 +370,8 @@ import { API } from '../Servicios/axios';
             API.get('alumnos/'+ asignatura)
             .then((response)=>{        
                 console.log(response.data)        
-                this.desserts = response.data              
+                this.desserts = response.data    
+                this.materia  = response.data[0].nombre       
             })            
         },
 

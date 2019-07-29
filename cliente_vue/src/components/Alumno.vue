@@ -121,14 +121,15 @@
 
                     <v-flex xs12 sm3 d-flex>
                         <v-select
-                        :items="alumnos"
+                        :items="alumnos"   
                         item-text="nombre"
-                        item-value="id"
+                        item-value="id"                     
                         label="Alumno"
                         v-model="alumno_select"
+                        @change="getAlumno()"
                         ></v-select>
                     </v-flex>
-                    <v-btn @click="getAlumno" > Seleccionar</v-btn>
+                    
                     <v-spacer></v-spacer>
 
                     <!-- Dialogo Alumno Actualizar-->
@@ -238,6 +239,20 @@
                     :items-per-page="5"
                     class="elevation-1"
                 ></v-data-table>
+                <v-simple-table>
+                    <thead>
+                    <tr>
+                        <th class="text-left">Nombre</th>
+                        <th class="text-left">Asignatura</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="item in desserts" :key="item.id">
+                        <td>{{ item.nombre }}</td>
+                        <td>{{ item.horario_id }}</td>
+                    </tr>
+                    </tbody>
+                </v-simple-table>
             </v-card>
         </div>
     </v-app>
@@ -293,13 +308,9 @@ import { API } from '../Servicios/axios';
             sortable: false,
             value: 'id',
           },
-          { text: 'Nombre', value: 'nombre' },
-          { text: 'RFID', value: 'RFID' },
-          { text: 'Asignatura', value: 'asignatura' },
-          { text: 'Fecha', value: 'protein' },
-          { text: 'Email', value: 'fecha' },
-          { text: 'Telefono', value: 'iron' },
-          { text: 'Asistencia', value: 'iron' },
+          { text: 'Alumno id', value: 'alumno_id' },
+          { text: 'Horariio id', value: 'horario_id' },         
+          { text: 'Fecha', value: 'fecha' }          
         ],
         desserts: [],
       }
@@ -350,9 +361,12 @@ import { API } from '../Servicios/axios';
                         apellido_materno: this.apellido_m_db,
                         correo: this.email_db, 
                         matricula: this.matricula_db,
-                        telefono:this.telefono_db
-
-                    })                                                          
+                        telefono:this.telefono_db,
+                        asignaturas:this.asignatura_db
+                    }).then((response)=>{        
+                        console.log(response)        
+                                    
+                    })                                                            
                     this.dialog2 = false;               
                     this.$validator.reset()                        
                 }            
@@ -403,7 +417,8 @@ import { API } from '../Servicios/axios';
         getAlumno(){
             
             API.get('alumno/' + this.alumno_select)
-            .then((response)=>{                              
+            .then((response)=>{ 
+                                            
                 this.nombre_db = response.data[0].nombre ,
                 this.apellido_p_db= response.data[0].apellido_paterno ,
                 this.apellido_m_db= response.data[0].apellido_materno ,
@@ -412,13 +427,15 @@ import { API } from '../Servicios/axios';
                 this.matricula_db= response.data[0].matricula ,
                 this.rfid_db= response.data[0].rfid 
 
-            })            
+            })   
+            this.getAsistencias()         
         },
 
         getAsistencias(){
-            API.get('asistencias/' + this.alumno_select)
-            .then((response)=>{                
-                this.desserts = response.data                  
+            API.get('alumno/' + this.alumno_select)
+            .then((response)=>{   
+                console.log(response.data[0].asistencias)             
+                this.desserts = response.data[0].asistencias                 
             })   
         },
 
