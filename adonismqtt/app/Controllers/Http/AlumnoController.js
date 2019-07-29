@@ -120,7 +120,7 @@ class AlumnoController {
       let {rfid} = request.all();
       let alumno = await Alumno.findBy('rfid', rfid)
 
-      if (alumno.rows == 0) {
+      if (!alumno) {
         return response.status(404).json({data: 'El alumno no esta registrado, por favor ingresar a la pagina de registro'})
       }
       socket.emit('alumno_rfid',rfid)
