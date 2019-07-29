@@ -234,10 +234,19 @@
 <script>
 import Vue from 'vue'
 import VeeValidate from 'vee-validate';
+import io from 'socket.io-client';
+const socket = io('http://localhost:3000')
 
  Vue.use(VeeValidate);
 
+socket.on('alumno_rfid',(rfid)=>{
+   this.rfid = rfid;
+});
+
   export default {
+    data: () => ({
+     rfid:"hola"
+    }),
     data () {
       return {
         nombre:"",
@@ -246,7 +255,6 @@ import VeeValidate from 'vee-validate';
         email:"",
         telefono:"",
         matricula:"",
-        rfid:"",
         asignatura:[],
 
         nombre_db:"",
@@ -289,7 +297,7 @@ import VeeValidate from 'vee-validate';
           {
             id: '1',
             nombre: 'Braulio',
-            RFID: 6.0,
+            RFID: this.rfid,
             asignatura: 24,
             fecha: 4.0,
             
