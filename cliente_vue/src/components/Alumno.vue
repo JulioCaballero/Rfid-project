@@ -62,6 +62,7 @@
                                     <v-text-field 
                                     label="Email*"
                                     v-model="email"
+                                    type="email"
                                     v-validate="'required'" 
                                     required></v-text-field>
                                 </v-flex>
@@ -70,7 +71,8 @@
                                     label="Telefono*" 
                                     v-model="telefono"
                                     v-validate="'required'"
-                                    required
+                                    required                                    
+                                    @keypress="isNumber($event)"
                                     ></v-text-field>
                                 </v-flex>
                                 <v-flex xs12>
@@ -78,7 +80,8 @@
                                     label="Matricula*" 
                                     v-model="matricula"
                                     v-validate="'required'"
-                                    required
+                                    required                                    
+                                    @keypress="isNumber($event)"
                                     ></v-text-field>
                                 </v-flex>
                                 <v-flex xs12>
@@ -94,6 +97,8 @@
                                     <v-select
                                     :items="materias"
                                     label="Asignaturas*"
+                                    item-text="nombre"
+                                    item-value="id"
                                     multiple
                                     v-model="asignatura"
                                     required
@@ -106,8 +111,8 @@
                             </v-card-text>
                             <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="blue darken-1" text @click="dialog = false">Close</v-btn>
-                            <v-btn color="blue darken-1" text @click="dialog = false">Save</v-btn>
+                            <v-btn color="blue darken-1" text @click="dialog = false">Cerrar</v-btn>
+                            <v-btn color="blue darken-1" text @click="submit">Guardar</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-dialog>  
@@ -117,10 +122,13 @@
                     <v-flex xs12 sm3 d-flex>
                         <v-select
                         :items="alumnos"
+                        item-text="nombre"
+                        item-value="id"
                         label="Alumno"
+                        v-model="alumno_select"
                         ></v-select>
                     </v-flex>
-                    <v-btn> Seleccionar</v-btn>
+                    <v-btn @click="getAlumno" > Seleccionar</v-btn>
                     <v-spacer></v-spacer>
 
                     <!-- Dialogo Alumno Actualizar-->
@@ -164,6 +172,7 @@
                                     <v-text-field 
                                     label="Email*"
                                     v-model="email_db"
+                                    
                                     v-validate="'required'" 
                                     required></v-text-field>
                                 </v-flex>
@@ -173,6 +182,7 @@
                                     v-model="telefono_db"
                                     v-validate="'required'"
                                     required
+                                    @keypress="isNumber($event)"
                                     ></v-text-field>
                                 </v-flex>
                                 <v-flex xs12>
@@ -181,20 +191,21 @@
                                     v-model="matricula_db"
                                     v-validate="'required'"
                                     required
+                                    @keypress="isNumber($event)"
                                     ></v-text-field>
                                 </v-flex>
                                 <v-flex xs12>
                                     <v-text-field 
                                     label="RFID*" 
-                                    v-model="rfid_db"
-                                    v-validate="'required'"
-                                    required
+                                    v-model="rfid_db"                                  
                                     disabled
                                     ></v-text-field>
                                 </v-flex>
                                 <v-flex xs12 sm6>
                                     <v-select
                                     :items="materias"
+                                    item-text="nombre"
+                                    item-value="id"
                                     label="Asignaturas*"
                                     multiple
                                     v-model="asignatura_db"
@@ -208,8 +219,8 @@
                             </v-card-text>
                             <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="blue darken-1" text @click="dialog2 = false">Close</v-btn>
-                            <v-btn color="blue darken-1" text @click="dialog2 = false">Save</v-btn>
+                            <v-btn color="blue darken-1" text @click="dialog2 = false">Cerrar</v-btn>
+                            <v-btn color="blue darken-1" text @click="actualizar">Actualizar</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-dialog>  
@@ -218,7 +229,7 @@
 
                     
                     
-                    <v-btn text class="red accent-4 text-center" dark >Eliminar</v-btn>                    
+                    <v-btn text class="red accent-4 text-center" dark @click="eliminar">Eliminar</v-btn>                    
                 </v-card-actions>
                 <br>
                 <v-data-table
@@ -234,8 +245,12 @@
 <script>
 import Vue from 'vue'
 import VeeValidate from 'vee-validate';
+<<<<<<< HEAD
 import io from 'socket.io-client';
 const socket = io('http://localhost:3000')
+=======
+import { API } from '../Servicios/axios';
+>>>>>>> 0cb7e99b756daeabb62c9c905219d7996910efa2
 
  Vue.use(VeeValidate);
 
@@ -249,13 +264,25 @@ socket.on('alumno_rfid',(rfid)=>{
     }),
     data () {
       return {
+          $_veeValidate: {
+        validator: 'new'
+        },
+
         nombre:"",
         apellido_p:"",
         apellido_m:"",
         email:"",
         telefono:"",
         matricula:"",
+<<<<<<< HEAD
+=======
+        rfid:"asdasd123",
+>>>>>>> 0cb7e99b756daeabb62c9c905219d7996910efa2
         asignatura:[],
+
+        alumnos:[],
+        id_alumno:[],
+        alumno_select:0,
 
         nombre_db:"",
         apellido_p_db:"",
@@ -270,13 +297,9 @@ socket.on('alumno_rfid',(rfid)=>{
         dialog: false,
         dialog2: false,
 
-        alumnos: ['Foo', 'Bar', 'Fizz', 'Buzz'],
+        //alumnos: ['Foo', 'Bar', 'Fizz', 'Buzz'],
 
-        materias:[
-            {text: 'Ciencias', id: '1' },
-            {text: 'matematicas', id: '2' },
-            {text: 'Español', id: '3' },
-        ],
+        materias:[],
 
         headers: [
           {
@@ -293,6 +316,7 @@ socket.on('alumno_rfid',(rfid)=>{
           { text: 'Telefono', value: 'iron' },
           { text: 'Asistencia', value: 'iron' },
         ],
+<<<<<<< HEAD
         desserts: [
           {
             id: '1',
@@ -327,7 +351,14 @@ socket.on('alumno_rfid',(rfid)=>{
             
           },
         ],
+=======
+        desserts: [],
+>>>>>>> 0cb7e99b756daeabb62c9c905219d7996910efa2
       }
+    },
+     created(){
+        this.getAlumnos()
+        this.getAsignaturas()
     },
     methods: {
         select2: function() {
@@ -339,6 +370,110 @@ socket.on('alumno_rfid',(rfid)=>{
         select4: function() {
             this.$router.push({name:'home'})
         },
+
+        submit () {        
+        this.$validator.validateAll().then(valid =>{
+            if(valid){
+                API({
+                    method: 'post',
+                    url: 'alumno/',
+                    data: {
+                        nombre: this.nombre,  
+                        apellido_paterno: this.apellido_p,
+                        apellido_materno: this.apellido_m,
+                        rfid:this.rfid,
+                        correo:this.email, 
+                        matricula: this.matricula,
+                        telefono:this.telefono, 
+                        asignaturas:this.asignatura  
+                    }
+                });                
+                this.dialog = false;                
+                this.clean();                        
+            }            
+        })
+        },
+        actualizar () {                    
+            this.$validator.validateAll().then(valid =>{
+                if(valid){
+                    API.put(('alumno/' + this.alumno_select),{
+                        nombre: this.nombre_db,  
+                        apellido_paterno: this.apellido_p_db,
+                        apellido_materno: this.apellido_m_db,
+                        correo: this.email_db, 
+                        matricula: this.matricula_db,
+                        telefono:this.telefono_db
+
+                    })                                                          
+                    this.dialog2 = false;               
+                    this.$validator.reset()                        
+                }            
+            })
+        },
+        eliminar(){
+            API({
+              method:'delete',
+              url:('alumno/' + this.alumno_select),
+            }).then(function (response) {
+                console.log(response);
+            })
+        },
+        clean(){
+            this.nombre="",
+            this.apellido_p="",
+            this.apellido_m="",
+            this.rfid="",
+            this.email = "",            
+            this.matricula = "",
+            this.telefono ="",
+            this.$validator.reset()          
+        },
+        isNumber: function(evt) {
+            evt = (evt) ? evt : window.event;
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
+                evt.preventDefault();
+            } else {
+                return true;
+            }
+        },
+
+        getAlumnos(){
+            API.get('alumno')
+            .then((response)=>{                
+                this.alumnos = response.data                  
+            })            
+        },
+
+        getAsignaturas(){
+            API.get('asignatura')
+            .then((response)=>{                
+                this.materias = response.data                  
+            })            
+        },
+
+        getAlumno(){
+            
+            API.get('alumno/' + this.alumno_select)
+            .then((response)=>{                              
+                this.nombre_db = response.data[0].nombre ,
+                this.apellido_p_db= response.data[0].apellido_paterno ,
+                this.apellido_m_db= response.data[0].apellido_materno ,
+                this.email_db= response.data[0].correo ,
+                this.telefono_db= response.data[0].telefono ,
+                this.matricula_db= response.data[0].matricula ,
+                this.rfid_db= response.data[0].rfid 
+
+            })            
+        },
+
+        getAsistencias(){
+            API.get('asistencias/' + this.alumno_select)
+            .then((response)=>{                
+                this.desserts = response.data                  
+            })   
+        },
+
     }
   }
 </script>

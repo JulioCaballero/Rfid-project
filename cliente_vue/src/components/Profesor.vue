@@ -69,6 +69,7 @@
                                     label="Telefono*" 
                                     v-model="telefono"
                                     v-validate="'required'"
+                                    @keypress="isNumber($event)"
                                     required
                                     ></v-text-field>
                                 </v-flex>
@@ -77,12 +78,15 @@
                                     label="Matricula*" 
                                     v-model="matricula"
                                     v-validate="'required'"
+                                    @keypress="isNumber($event)"
                                     required
                                     ></v-text-field>
                                 </v-flex>                                
                                 <v-flex xs12 sm6>
                                     <v-select
                                     :items="materias"
+                                    item-text="nombre"
+                                    item-value="id"
                                     label="Asignaturas*"                                    
                                     v-model="asignatura"
                                     required
@@ -95,8 +99,8 @@
                             </v-card-text>
                             <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="blue darken-1" text @click="dialog = false">Close</v-btn>
-                            <v-btn color="blue darken-1" text @click="dialog = false">Save</v-btn>
+                            <v-btn color="blue darken-1" text @click="dialog = false">Cerrar</v-btn>
+                            <v-btn color="blue darken-1" text @click="submit">Guardar</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-dialog>  
@@ -105,10 +109,13 @@
                     <v-flex xs12 sm3 d-flex>
                         <v-select
                         :items="profesores"
+                        item-text="nombre"
+                        item-value="id"
                         label="Profesores"
+                        v-model="profesor_select"
                         ></v-select>
                     </v-flex>
-                    <v-btn> Seleccionar</v-btn>
+                    <v-btn @click="getProfesor"> Seleccionar</v-btn>
                     <v-spacer></v-spacer>
 
                     <!-- Dialogo Profesor Actualizar-->
@@ -160,6 +167,7 @@
                                     label="Telefono*" 
                                     v-model="telefono_db"
                                     v-validate="'required'"
+                                    @keypress="isNumber($event)"
                                     required
                                     ></v-text-field>
                                 </v-flex>
@@ -168,12 +176,15 @@
                                     label="Matricula*" 
                                     v-model="matricula_db"
                                     v-validate="'required'"
+                                    @keypress="isNumber($event)"
                                     required
                                     ></v-text-field>
                                 </v-flex>                                
                                 <v-flex xs12 sm6>
                                     <v-select
                                     :items="materias"
+                                    item-text="nombre"
+                                    item-value="id"
                                     label="Asignaturas*"                                    
                                     v-model="asignatura_db"
                                     required
@@ -186,8 +197,8 @@
                             </v-card-text>
                             <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="blue darken-1" text @click="dialog2 = false">Close</v-btn>
-                            <v-btn color="blue darken-1" text @click="dialog2 = false">Save</v-btn>
+                            <v-btn color="blue darken-1" text @click="dialog2 = false">Cerrar</v-btn>
+                            <v-btn color="blue darken-1" text @click="actualizar">Actualizar</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-dialog>  
@@ -196,12 +207,12 @@
 
                     
                     
-                    <v-btn text class="red accent-4 text-center" dark >Eliminar</v-btn>                    
+                    <v-btn text class="red accent-4 text-center" dark @click="eliminar">Eliminar</v-btn>                    
                 </v-card-actions>
                 <br>
                 <v-data-table
                     :headers="headers"
-                    :items="desserts"
+                    :items="desserts[0]"
                     :items-per-page="5"
                     class="elevation-1"
                 ></v-data-table>
@@ -212,20 +223,23 @@
 <script>
 import Vue from 'vue'
 import VeeValidate from 'vee-validate';
-
+import { API } from '../Servicios/axios';
  Vue.use(VeeValidate);
 
   export default {
     data () {
       return {
+        $_veeValidate: {
+        validator: 'new'
+        },
         nombre:"",
         apellido_p:"",
         apellido_m:"",
         email:"",
         telefono:"",
-        matricula:"",
-        rfid:"",
-        asignatura:[],
+        matricula:"",       
+        
+        asignatura:0,
 
         nombre_db:"",
         apellido_p_db:"",
@@ -233,20 +247,18 @@ import VeeValidate from 'vee-validate';
         email_db:"",
         telefono_db:"",
         matricula_db:"",
-        rfid_db:"",
-        asignatura_db:[],
+        
+        asignatura_db:0,
 
 
         dialog: false,
         dialog2: false,
 
-        profesores: ['Foo', 'Bar', 'Fizz', 'Buzz'],
+        profesor_select:0,
 
-        materias:[
-            {text: 'Ciencias', id: '1' },
-            {text: 'matematicas', id: '2' },
-            {text: 'Español', id: '3' },
-        ],
+        profesores: [],
+
+        materias:[],
 
         headers: [
           {
@@ -262,41 +274,12 @@ import VeeValidate from 'vee-validate';
           { text: 'Telefono', value: 'iron' },
           
         ],
-        desserts: [
-          {
-            id: '1',
-            nombre: 'Braulio',
-            RFID: 6.0,
-            asignatura: 24,
-            fecha: 4.0,
-            
-          },
-          {
-            id: '2',
-            nombre: 237,
-            RFID: 9.0,
-            asignatura: 37,
-            fecha: 4.3,
-           
-          },
-          {
-            id: '3',
-            nombre: 262,
-            RFID: 16.0,
-            asignatura: 23,
-            fecha: 6.0,
-           
-          },
-          {
-            id: '4',
-            nombre: 305,
-            RFID: 3.7,
-            asignatura: 67,
-            fecha: 4.3,
-            
-          },
-        ],
+        desserts: [],
       }
+    },
+    created(){
+        this.getProfesores()
+        this.getAsignaturas()
     },
     methods: {
         select: function() {
@@ -308,6 +291,115 @@ import VeeValidate from 'vee-validate';
         select4: function() {
             this.$router.push({name:'home'})
         },
+        submit () {        
+        this.$validator.validateAll().then(valid =>{
+            if(valid){
+                API({
+                    method: 'post',
+                    url: 'profesor/',
+                    data: {
+                        nombre: this.nombre,  
+                        apellido_paterno: this.apellido_p,
+                        apellido_materno: this.apellido_m,                        
+                        correo:this.email, 
+                        matricula: this.matricula,
+                        telefono:this.telefono, 
+                        asignatura_id:this.asignatura
+                    }
+                }).then(function (response) {
+                    console.log(response);
+                });                
+                this.dialog = false;                
+                this.clean();                        
+            }            
+        })
+        },
+        actualizar () {                    
+            this.$validator.validateAll().then(valid =>{
+                if(valid){
+                    API.put(('profesor/' + this.profesor_select),{
+                        nombre: this.nombre_db,  
+                        apellido_paterno: this.apellido_p_db,
+                        apellido_materno: this.apellido_m_db,
+                        correo: this.email_db, 
+                        matricula: this.matricula_db,
+                        telefono:this.telefono_db,
+                        asignatura_id:this.asignatura_db
+                    })                                                          
+                    this.dialog2 = false;               
+                    this.$validator.reset()                       
+                }            
+            })
+        },
+        eliminar(){
+            API({
+              method:'delete',
+              url:('profesor/' + this.profesor_select),
+            }).then(function (response) {
+                console.log(response);
+            })
+        },
+        clean(){
+            this.nombre="",
+            this.apellido_p="",
+            this.apellido_m="",
+            this.rfid="",
+            this.email = "",            
+            this.matricula = "",
+            this.telefono ="",
+            this.$validator.reset()          
+        },
+        isNumber: function(evt) {
+            evt = (evt) ? evt : window.event;
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
+                evt.preventDefault();
+            } else {
+                return true;
+            }
+        },
+
+        getAsistencias_Asignatura(asignatura){
+            API.get('alumnos/'+ asignatura)
+            .then((response)=>{        
+                console.log(response.data)        
+                this.desserts = response.data              
+            })            
+        },
+
+        getProfesores(){
+            API.get('profesor')
+            .then((response)=>{                
+                this.profesores = response.data                  
+            })            
+        },
+
+        getAsignaturas(){
+            API.get('asignatura')
+            .then((response)=>{                
+                this.materias = response.data                  
+            })            
+        },
+
+        getProfesor(){
+            
+            API.get('profesor/' + this.profesor_select)
+            .then((response)=>{     
+                                    
+                this.nombre_db = response.data.nombre ,
+                this.apellido_p_db= response.data.apellido_paterno ,
+                this.apellido_m_db= response.data.apellido_materno ,
+                this.email_db= response.data.correo ,
+                this.telefono_db= response.data.telefono ,
+                this.matricula_db= response.data.matricula,             
+                this.asignatura_db = response.data.asignatura_id
+                this.getAsistencias_Asignatura(response.data.asignatura_id)
+            })  
+            
+        },    
+        
+         
+
     }
   }
 </script>
