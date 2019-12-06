@@ -121,14 +121,15 @@
 
                     <v-flex xs12 sm3 d-flex>
                         <v-select
-                        :items="alumnos"
+                        :items="alumnos"   
                         item-text="nombre"
-                        item-value="id"
+                        item-value="id"                     
                         label="Alumno"
                         v-model="alumno_select"
+                        @change="getAlumno()"
                         ></v-select>
                     </v-flex>
-                    <v-btn @click="getAlumno" > Seleccionar</v-btn>
+                    
                     <v-spacer></v-spacer>
 
                     <!-- Dialogo Alumno Actualizar-->
@@ -232,41 +233,80 @@
                     <v-btn text class="red accent-4 text-center" dark @click="eliminar">Eliminar</v-btn>                    
                 </v-card-actions>
                 <br>
+                <v-container><h3>Datos del Alumno</h3></v-container>
+                
+                <v-simple-table>
+                    <thead>
+                    <tr>
+                        <th class="text-left">Nombre</th>
+                        <th class="text-left">RFID</th>
+                        <th class="text-left">Correo</th>
+                        <th class="text-left">Matricula</th>
+                        <th class="text-left">Telefono</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="item in data_alumno" :key="item.id">
+                        <td>{{ item.nombre }}</td>
+                        <td>{{ item.rfid }}</td>
+                        <td>{{ item.correo }}</td>
+                        <td>{{ item.matricula }}</td>
+                        <td>{{ item.telefono }}</td>
+                    </tr>
+                    </tbody>
+                </v-simple-table>
+                <br>
+                <v-container><h3>Asistencias</h3></v-container>
                 <v-data-table
                     :headers="headers"
                     :items="desserts"
                     :items-per-page="5"
                     class="elevation-1"
                 ></v-data-table>
+                <br>
+                <v-container><h3>Materias Asistidas</h3></v-container>
+                <v-simple-table>
+                    <thead>
+                    <tr>
+                        <th class="text-left">Nombre</th>
+                        <th class="text-left">Hora Inicio</th>
+                        <th class="text-left">Hora Final</th>
+                        <th class="text-left">Dia</th>                    
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="item in materias_alumno" :key="item.id">
+                        <td>{{ item.nombre }}</td>
+                        <td>{{ item.horario.hora_inicio }}</td>
+                        <td>{{ item.horario.hora_fin }}</td>
+                        <td>{{ item.horario.dia }}</td>                        
+                    </tr>
+                    </tbody>
+                </v-simple-table>
+                
+                
             </v-card>
         </div>
     </v-app>
 </template>
+
 <script>
 import Vue from 'vue'
 import VeeValidate from 'vee-validate';
-<<<<<<< HEAD
-import io from 'socket.io-client';
-const socket = io('http://localhost:3000')
-=======
 import { API } from '../Servicios/axios';
->>>>>>> 0cb7e99b756daeabb62c9c905219d7996910efa2
+import io from 'socket.io-client';
+
 
  Vue.use(VeeValidate);
 
-socket.on('alumno_rfid',(rfid)=>{
-   this.rfid = rfid;
-});
-
   export default {
-    data: () => ({
-     rfid:"hola"
-    }),
     data () {
       return {
           $_veeValidate: {
         validator: 'new'
         },
+        socket: io('http://192.168.0.62:3000'),
+        
 
         nombre:"",
         apellido_p:"",
@@ -274,10 +314,7 @@ socket.on('alumno_rfid',(rfid)=>{
         email:"",
         telefono:"",
         matricula:"",
-<<<<<<< HEAD
-=======
-        rfid:"asdasd123",
->>>>>>> 0cb7e99b756daeabb62c9c905219d7996910efa2
+        rfid:"",
         asignatura:[],
 
         alumnos:[],
@@ -308,55 +345,22 @@ socket.on('alumno_rfid',(rfid)=>{
             sortable: false,
             value: 'id',
           },
-          { text: 'Nombre', value: 'nombre' },
-          { text: 'RFID', value: 'RFID' },
-          { text: 'Asignatura', value: 'asignatura' },
-          { text: 'Fecha', value: 'protein' },
-          { text: 'Email', value: 'fecha' },
-          { text: 'Telefono', value: 'iron' },
-          { text: 'Asistencia', value: 'iron' },
+          { text: 'Alumno id', value: 'alumno_id' },
+          { text: 'Horario id', value: 'horario_id' },         
+          { text: 'Fecha', value: 'fecha' }          
         ],
-<<<<<<< HEAD
-        desserts: [
-          {
-            id: '1',
-            nombre: 'Braulio',
-            RFID: this.rfid,
-            asignatura: 24,
-            fecha: 4.0,
-            
-          },
-          {
-            id: '2',
-            nombre: 237,
-            RFID: 9.0,
-            asignatura: 37,
-            fecha: 4.3,
-           
-          },
-          {
-            id: '3',
-            nombre: 262,
-            RFID: 16.0,
-            asignatura: 23,
-            fecha: 6.0,
-           
-          },
-          {
-            id: '4',
-            nombre: 305,
-            RFID: 3.7,
-            asignatura: 67,
-            fecha: 4.3,
-            
-          },
-        ],
-=======
         desserts: [],
->>>>>>> 0cb7e99b756daeabb62c9c905219d7996910efa2
+        materias_alumno:[],
+        data_alumno:[]
       }
     },
-     created(){
+    mounted() {
+        this.socket.on('rfid_frontend', (data) => {
+            this.rfid = data;
+            // you can also do this.messages.push(data)
+        });
+    },
+    created(){
         this.getAlumnos()
         this.getAsignaturas()
     },
@@ -402,9 +406,12 @@ socket.on('alumno_rfid',(rfid)=>{
                         apellido_materno: this.apellido_m_db,
                         correo: this.email_db, 
                         matricula: this.matricula_db,
-                        telefono:this.telefono_db
-
-                    })                                                          
+                        telefono:this.telefono_db,
+                        asignaturas:this.asignatura_db
+                    }).then((response)=>{        
+                        console.log(response)        
+                                    
+                    })                                                            
                     this.dialog2 = false;               
                     this.$validator.reset()                        
                 }            
@@ -455,7 +462,8 @@ socket.on('alumno_rfid',(rfid)=>{
         getAlumno(){
             
             API.get('alumno/' + this.alumno_select)
-            .then((response)=>{                              
+            .then((response)=>{ 
+                                            
                 this.nombre_db = response.data[0].nombre ,
                 this.apellido_p_db= response.data[0].apellido_paterno ,
                 this.apellido_m_db= response.data[0].apellido_materno ,
@@ -464,13 +472,17 @@ socket.on('alumno_rfid',(rfid)=>{
                 this.matricula_db= response.data[0].matricula ,
                 this.rfid_db= response.data[0].rfid 
 
-            })            
+            })   
+            this.getAsistencias()         
         },
 
         getAsistencias(){
-            API.get('asistencias/' + this.alumno_select)
-            .then((response)=>{                
-                this.desserts = response.data                  
+            API.get('alumno/' + this.alumno_select)
+            .then((response)=>{   
+                console.log(response.data[0].asistencias) 
+                this.data_alumno = response.data,            
+                this.desserts = response.data[0].asistencias,
+                this.materias_alumno = response.data[0].asignaturas             
             })   
         },
 

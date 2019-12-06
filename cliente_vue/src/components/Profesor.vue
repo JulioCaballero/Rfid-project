@@ -113,9 +113,10 @@
                         item-value="id"
                         label="Profesores"
                         v-model="profesor_select"
+                        @change="getProfesor()"
                         ></v-select>
                     </v-flex>
-                    <v-btn @click="getProfesor"> Seleccionar</v-btn>
+                    
                     <v-spacer></v-spacer>
 
                     <!-- Dialogo Profesor Actualizar-->
@@ -202,17 +203,43 @@
                             </v-card-actions>
                         </v-card>
                     </v-dialog>  
-                    <!-- Dialogo Profesor Actualizar -->
-
-
-                    
+                    <!-- Dialogo Profesor Actualizar -->                   
                     
                     <v-btn text class="red accent-4 text-center" dark @click="eliminar">Eliminar</v-btn>                    
                 </v-card-actions>
+                <v-text-field 
+                label="Asignatura" 
+                v-model="materia"
+                
+                disabled
+                required
+                ></v-text-field>
                 <br>
+                <v-container><h3>Datos del Profesor</h3></v-container>
+                
+                <v-simple-table>
+                    <thead>
+                    <tr>
+                        <th class="text-left">Nombre</th>                        
+                        <th class="text-left">Correo</th>
+                        <th class="text-left">Matricula</th>
+                        <th class="text-left">Telefono</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="item in data_profesor" :key="item.id">
+                        <td>{{ item.nombre }}</td>                        
+                        <td>{{ item.correo }}</td>
+                        <td>{{ item.matricula }}</td>
+                        <td>{{ item.telefono }}</td>
+                    </tr>
+                    </tbody>
+                </v-simple-table>
+                <br>
+                <v-container><h3>Alumnos de la Materia</h3></v-container>
                 <v-data-table
                     :headers="headers"
-                    :items="desserts[0]"
+                    :items="desserts"
                     :items-per-page="5"
                     class="elevation-1"
                 ></v-data-table>
@@ -257,21 +284,19 @@ import { API } from '../Servicios/axios';
         profesor_select:0,
 
         profesores: [],
-
+        materia:"",
         materias:[],
-
+        data_profesor:[],
         headers: [
           {
             text: 'ID',
             align: 'left',
             sortable: false,
             value: 'id',
-          },
-          { text: 'Nombre', value: 'nombre' },
-          { text: 'Asignatura', value: 'asignatura' },
-          { text: 'Fecha', value: 'protein' },
-          { text: 'Email', value: 'fecha' },
-          { text: 'Telefono', value: 'iron' },
+          },          
+          { text: 'Nombre', value: 'nombre' },          
+          { text: 'Email', value: 'correo' },
+          { text: 'Telefono', value: 'telefono' },
           
         ],
         desserts: [],
@@ -310,7 +335,8 @@ import { API } from '../Servicios/axios';
                     console.log(response);
                 });                
                 this.dialog = false;                
-                this.clean();                        
+                this.clean(); 
+                this.getProfesores();                       
             }            
         })
         },
@@ -327,7 +353,8 @@ import { API } from '../Servicios/axios';
                         asignatura_id:this.asignatura_db
                     })                                                          
                     this.dialog2 = false;               
-                    this.$validator.reset()                       
+                    this.$validator.reset()
+                    this.getProfesores()                       
                 }            
             })
         },
@@ -363,7 +390,8 @@ import { API } from '../Servicios/axios';
             API.get('alumnos/'+ asignatura)
             .then((response)=>{        
                 console.log(response.data)        
-                this.desserts = response.data              
+                this.desserts = response.data[0].alumnos 
+                this.materia  = response.data[0].nombre       
             })            
         },
 
@@ -385,7 +413,8 @@ import { API } from '../Servicios/axios';
             
             API.get('profesor/' + this.profesor_select)
             .then((response)=>{     
-                                    
+                
+                this.data_profesor.push(response.data),                              
                 this.nombre_db = response.data.nombre ,
                 this.apellido_p_db= response.data.apellido_paterno ,
                 this.apellido_m_db= response.data.apellido_materno ,
