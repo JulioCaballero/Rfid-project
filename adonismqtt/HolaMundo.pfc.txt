@@ -1,0 +1,9 @@
+program HolaMundo;
+var
+    x : integer;
+    y : real;
+
+
+begin
+    write('hola Mundo')
+end.

@@ -54,7 +54,8 @@ class AsistenciaController {
       const validation = await validate(request.all(), rules)
       const { rfid } = request.all();
       const now = new Date();
-      const dia = now.getDay();
+      const dia = now.getDate();
+      const dia2 = now.getDay();
       // const dia = 1;
       const mes = now.getMonth() + 1;
       const anio = now.getFullYear();
@@ -62,7 +63,8 @@ class AsistenciaController {
       // const hora = 1;
       const minutos = now.getMinutes();
       const fecha_actual = anio + '-' + mes + '-' + dia + ' ' + hora + ':' + minutos;
-      console.log(fecha_actual)
+      console.log("Date:"+dia)
+      console.log("Date:"+dia2)
       if (validation.fails()) {
         return validation.messages()
       }
